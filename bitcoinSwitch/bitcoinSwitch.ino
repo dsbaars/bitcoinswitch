@@ -26,6 +26,10 @@ long thresholdTime; // Time to turn pin on, 'long thresholdTime = 2000;' / 'long
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
 #include <WebSocketsClient.h>
+#include <WiFiManager.h>
+
+//ImprovWiFi improvSerial(&Serial);
+
 
 fs::SPIFFSFS &FlashFS = SPIFFS;
 #define FORMAT_ON_FAIL true
@@ -59,6 +63,8 @@ struct KeyValue {
 
 void setup()
 {
+    WiFiManager wifiManager;
+
     Serial.begin(115200);
     Serial.println("Welcome to BitcoinSwitch, running on version: " + version);
     bool triggerConfig = false;
@@ -83,8 +89,12 @@ void setup()
 
     readFiles(); // get the saved details and store in global variables
 
-    if(triggerConfig == true || ssid == "" || ssid == "null"){
+    wifiManager.autoConnect("BitcoinSwitch", "turnMeOn");
+
+    if(triggerConfig == true){
         Serial.println("Launch serial config");
+       
+
         configOverSerialPort();
     }
     else{
